@@ -1,0 +1,24 @@
+# Root ignores
+node_modules/
+.env
+.env.*
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+/dist
+/build
+coverage/
+
+# Editor
+.vscode/
+.idea/
+
+# Runtime
+.es-data/
+.weaviate-data/

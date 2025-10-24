@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: reachinbox-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  weaviate:
+    image: semitechnologies/weaviate:1.25.7
+    container_name: reachinbox-weaviate
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      - DEFAULT_VECTORIZER_MODULE=none
+      - CLUSTER_HOSTNAME=node1
+      # If you prefer Weaviate to do embeddings with OpenAI, set:
+      # - ENABLE_MODULES=text2vec-openai
+      # - DEFAULT_VECTORIZER_MODULE=text2vec-openai
+      # - OPENAI_APIKEY=${OPENAI_API_KEY}
+    volumes:
+      - wdata:/var/lib/weaviate
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/.well-known/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  esdata:
+  wdata:
